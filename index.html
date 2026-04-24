@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sweet Mobile UI Prototype</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        sweet: {
+                            purple: '#c084fc', // Soft purple
+                            pink: '#f472b6',   // Soft pink
+                            bg: '#fdf2f8',     // Very light pink background
+                            text: '#4a044e',   // Deep purple for readable text
+                            card: '#ffffff'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'float-delayed': 'float 3s ease-in-out 1.5s infinite',
+                        'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                        'wiggle': 'wiggle 2s linear infinite',
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        heartbeat: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '14%': { transform: 'scale(1.15)' },
+                            '28%': { transform: 'scale(1)' },
+                            '42%': { transform: 'scale(1.15)' },
+                            '70%': { transform: 'scale(1)' },
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(-5%)', animationTimingFunction: 'cubic-bezier(0.8,0,1,1)' },
+                            '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0,0,0.2,1)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbars completely for clean app-like feel */
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; background-color: #fce7f3; }
+
+        /* Premium Glass effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(244, 114, 182, 0.15);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -4px 24px rgba(244, 114, 182, 0.1);
+        }
+
+        /* Cute Card Style */
+        .cute-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.15), 0 8px 10px -6px rgba(244, 114, 182, 0.1);
+            border: 2px solid #fdf2f8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cute-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(244, 114, 182, 0.2), 0 10px 10px -5px rgba(244, 114, 182, 0.1);
+            border-color: #fbcfe8;
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Chat Bubbles */
+        .bubble-left {
+            border-radius: 24px 24px 24px 6px;
+            background: linear-gradient(135deg, #ffffff, #fdf2f8);
+            border: 1px solid #fce7f3;
+        }
+        .bubble-right {
+            border-radius: 24px 24px 6px 24px;
+            background: linear-gradient(135deg, #fae8ff, #f3e8ff);
+            border: 1px solid #f3e8ff;
+        }
+
+        /* Active Nav Button */
+        .nav-btn.active {
+            background: linear-gradient(to right, #c084fc, #f472b6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
+        }
+
+        /* Premium Device Frame Outline (ออร่าเริ่ดๆ) */
+        @media (min-width: 640px) {
+            .premium-frame {
+                border: 10px solid rgba(255, 255, 255, 0.95);
+                box-shadow: 
+                    0 0 0 5px rgba(255, 255, 255, 0.5), /* ขอบกระจกใสวงนอก */
+                    0 25px 50px -12px rgba(244, 114, 182, 0.35), /* เงาชมพูพาสเทลฟุ้งๆ */
+                    0 0 35px rgba(192, 132, 252, 0.25), /* ออร่าแสงสีม่วงเบาๆ */
+                    inset 0 0 15px rgba(255, 255, 255, 0.8); /* แสงสะท้อนในขอบ */
+                transform: translateY(-2px);
+                transition: all 0.5s ease-out;
+            }
+            .premium-frame:hover {
+                transform: translateY(-6px);
+                box-shadow: 
+                    0 0 0 6px rgba(255, 255, 255, 0.6), 
+                    0 30px 60px -10px rgba(244, 114, 182, 0.45), 
+                    0 0 45px rgba(192, 132, 252, 0.35), 
+                    inset 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+    </style>
+</head>
+<body class="flex justify-center h-[100dvh] overflow-hidden items-center text-sweet-text">
+
+    <!-- Mobile Device Container (Phone outline look on desktop) -->
+    <div class="w-full max-w-[414px] bg-sweet-bg h-[100dvh] sm:h-[90vh] sm:rounded-[3rem] flex flex-col relative overflow-hidden premium-frame">
+        
+        <!-- Header (Fixed) -->
+        <header class="glass-panel px-6 py-4 flex justify-between items-center z-20 shrink-0 rounded-b-3xl mx-2 mt-2">
+            <i class="fa-solid fa-heart text-sweet-pink text-xl animate-heartbeat shrink-0"></i>
+            <div class="flex-1 overflow-hidden px-3">
+                <marquee behavior="scroll" scrollamount="4">
+                    <h1 class="text-sm sm:text-base font-bold text-gradient tracking-wide text-center whitespace-nowrap">WELCOME TO NORI DESIGN ✨</h1>
+                </marquee>
+            </div>
+            <i class="fa-solid fa-heart text-sweet-purple text-xl animate-heartbeat shrink-0" style="animation-delay: 0.5s;"></i>
+        </header>
+
+        <!-- Main Content Scrollable Area -->
+        <main id="main-scroll-area" class="flex-1 overflow-y-auto overflow-x-hidden relative pb-28 pt-4 px-4 scroll-smooth">
+            
+            <!-- ================= PAGE 1: HOME (หน้าหลัก) ================= -->
+            <div id="page-home" class="page-content space-y-6 block animate-fade-in-up">
+                
+                <!-- Top Section: Name & Logo -->
+                <div class="flex items-center justify-between gap-3 mt-1">
+                    <div class="flex-1 flex flex-col justify-center">
+                        <!-- ชื่อร้าน (ไม่มีกรอบ พร้อมลูกเล่นข้อความไล่สีและไอคอนวิบวับ) -->
+                        <div class="mb-2 pl-1">
+                            <h2 class="font-extrabold text-2xl text-gradient relative inline-block drop-shadow-sm">
+                                Nori Design
+                                <i class="fa-solid fa-wand-magic-sparkles text-yellow-400 text-sm absolute -top-1 -right-6 animate-bounce-soft"></i>
+                            </h2>
+                        </div>
+                        <!-- คำโปรย (จัดระเบียบเป็นข้อๆ ให้อ่านง่ายขึ้น) -->
+                        <div class="bg-white/90 rounded-2xl p-3 shadow-sm border border-pink-100 backdrop-blur-sm text-left">
+                            <p class="text-sweet-purple text-[13px] sm:text-sm font-semibold leading-relaxed border-b border-pink-100 pb-1.5 mb-1.5">
+                                🌻 ร้านโนริพร้อมบริการลูกค้าที่น่ารักทุกท่านค้าบ 🌈
+                            </p>
+                            <div class="space-y-1.5">
+                                <p class="text-gray-600 text-[11px] sm:text-xs flex items-start gap-1.5 leading-tight"><i class="fa-solid fa-ticket text-pink-400 mt-0.5 w-3 text-center"></i> มีบัตรสะสมแต้ม</p>
+                                <p class="text-gray-600 text-[11px] sm:text-xs flex items-start gap-1.5 leading-tight"><i class="fa-solid fa-users text-purple-400 mt-0.5 w-3 text-center"></i> ลูกค้าเข้ากลุ่มรับผ่อนด้วยนะคะ</p>
+                                <p class="text-sweet-pink text-[11px] sm:text-xs font-bold flex items-start gap-1.5 leading-tight mt-1"><i class="fa-solid fa-comment-dots text-pink-500 mt-0.5 w-3 text-center"></i> 💥 สนใจ/สั่งซื้อ ทักถามได้เลยค้าบ ✨</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Logo Circle with Animation -->
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 cute-card rounded-full flex items-center justify-center shrink-0 border-4 border-white animate-float relative z-10 p-1">
+                        <div class="absolute inset-2 rounded-full border border-pink-200 border-dashed animate-spin" style="animation-duration: 10s;"></div>
+                        <img src="https://i.postimg.cc/9fdRrYWG/att-b-TBt8GNQs1JNUVZ4Z20Nqzig-JMn-Jm-Dz-Tg6i-Hdk-XGp-Vg.jpg" alt="Nori Design Logo" class="w-full h-full object-cover rounded-full z-10">
+                    </div>
+                </div>
+
+                <!-- Social Buttons (Pills) -->
+                <div class="flex gap-2 px-1">
+                    <a href="https://www.facebook.com/nori.desing?" target="_blank" class="flex-1 bg-white hover:bg-pink-50 rounded-2xl py-2 sm:py-3 font-semibold text-sweet-purple shadow-md border border-pink-100 transition-all transform active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-center">
+                        <i class="fa-brands fa-facebook text-blue-500 text-lg"></i> เฟสหลัก
+                    </a>
+                    <a href="https://line.me/ti/p/52g9gbGSfC" target="_blank" class="flex-1 bg-white hover:bg-pink-50 rounded-2xl py-2 sm:py-3 font-semibold text-sweet-purple shadow-md border border-pink-100 transition-all transform active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-center">
+                        <i class="fa-brands fa-line text-green-500 text-lg"></i> ไลน์
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61574306123714" target="_blank" class="flex-1 bg-white hover:bg-pink-50 rounded-2xl py-2 sm:py-3 font-semibold text-sweet-purple shadow-md border border-pink-100 transition-all transform active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-center">
+                        <i class="fa-brands fa-facebook text-pink-500 text-lg"></i> ลงงานเว็บ
+                    </a>
+                </div>
+
+                <!-- Highlight Circles (Story Highlights look) -->
+                <div class="flex justify-between items-center px-1 pt-2">
+                    <div class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-pink-200 flex items-center justify-center text-pink-300 hover:scale-110 transition cursor-pointer animate-float"><i class="fa-solid fa-star"></i></div>
+                    <div class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-purple-200 flex items-center justify-center text-purple-300 hover:scale-110 transition cursor-pointer animate-float-delayed"><i class="fa-solid fa-moon"></i></div>
+                    <div class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-pink-200 flex items-center justify-center text-pink-300 hover:scale-110 transition cursor-pointer animate-float"><i class="fa-solid fa-crown"></i></div>
+                    <div class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-purple-200 flex items-center justify-center text-purple-300 hover:scale-110 transition cursor-pointer animate-float-delayed"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-pink-200 flex items-center justify-center text-pink-300 hover:scale-110 transition cursor-pointer animate-float"><i class="fa-solid fa-gift"></i></div>
+                </div>
+
+                <!-- Main Details Box -->
+                <div class="cute-card p-5 flex flex-col relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:animate-wiggle text-pink-400 text-6xl"><i class="fa-solid fa-bow"></i></div>
+                    
+                    <h3 class="text-sweet-purple font-bold text-lg mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-pink-400"></i> ระยะเวลารองาน
+                    </h3>
+                    <ul class="text-sm text-gray-600 space-y-1 mb-4 pl-6 list-disc marker:text-pink-300 font-light">
+                        <li><span class="font-medium text-sweet-pink">งานเว็บ:</span> ตามปกติรองาน 4-8 ชั่วโมง แล้วแต่คิวของวันนั้นๆ</li>
+                        <li><span class="font-medium text-sweet-pink">งานป้าย/สติกเกอร์:</span> คิวไม่เยอะรอภายในวันที่สั่ง ปกติ 1-2 วัน แล้วแต่คิวแต่ละวัน</li>
+                    </ul>
+
+                    <h3 class="text-sweet-purple font-bold text-lg mb-3 flex items-center gap-2 mt-2">
+                        <i class="fa-solid fa-sack-dollar text-pink-400"></i> เรทราคางาน
+                    </h3>
+                    <ul class="text-sm text-gray-600 space-y-1.5 mb-4 pl-6 list-disc marker:text-purple-300 font-light">
+                        <li><span class="font-medium text-sweet-pink">งานเว็บ</span> เอาตามแบบที่ร้านมีให้ราคา 129.-</li>
+                        <li><span class="font-medium text-sweet-pink">งานเว็บ</span> ให้ทางร้านออกแบบใหม่ไม่ซ้ำใครราคา 329.-</li>
+                        <li><span class="font-medium text-sweet-pink">งานเว็บ</span> ที่ร้านปล่อยเอฟไม่เหมือนใครราคา 300.-</li>
+                        <li><span class="font-medium text-sweet-purple">งานป้าย</span> เริ่มต้น 89.- <span class="text-xs text-gray-400">(ขึ้นอยู่กับแนวและรายละเอียด)</span></li>
+                        <li><span class="font-medium text-sweet-purple">งานสติกเกอร์แชท</span> 6 ตัว 59.- / 9 ตัว 75.-</li>
+                        <li><span class="font-medium text-sweet-purple">งานสติกเกอร์เจนรูป/รูปตัวเอง</span> เซ็ตละ 110.-</li>
+                        <li><span class="font-medium text-sweet-purple">งานสติกเกอร์ไลน์</span> เริ่มต้น 280.-</li>
+                    </ul>
+                    <div class="bg-red-50 text-red-500 text-xs font-bold text-center py-2 rounded-xl mb-5 border border-red-100 animate-pulse">
+                        🚨 *** งานเร่งราคาคูณ 2 *** 🚨
+                    </div>
+
+                    <h3 class="text-sweet-purple font-bold text-lg mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-thumbtack text-pink-400"></i> 📍 กฎของร้าน 📍
+                    </h3>
+                    <div class="bg-pink-50/50 rounded-xl p-3 border border-pink-100">
+                        <ul class="text-sm text-gray-600 space-y-2 font-light">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-exclamation text-pink-400 text-[10px] mt-1"></i> ถ้าโอนเงินแล้วทางร้านไม่คืนเงินทุกกรณีนะคะ</li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-exclamation text-pink-400 text-[10px] mt-1"></i> หากยกเลิกงานหลังส่งบรีฟมาแล้ว หากงานเริ่มไปแล้วจะคืนแค่ 50% ค่ะ</li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-exclamation text-pink-400 text-[10px] mt-1"></i> หากยกเลิกหลังจากเช็คงาน = ไม่คืน และส่งงานให้ตามปกติ</li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-exclamation text-pink-400 text-[10px] mt-1"></i> หากแก้งานหลัง 1 เดือน นับจากส่งเว็บ +เพิ่มครั้งละ 50.- <span class="text-xs text-gray-400">(ขึ้นอยู่กับความยาก)</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 2: BRIEF/SELECT (เลือกเพื่อบรีฟ) ================= -->
+            <div id="page-brief" class="page-content space-y-5 hidden">
+                <div class="text-center mb-2 animate-fade-in-up">
+                    <span class="bg-pink-100 text-pink-500 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide">STEP 1</span>
+                    <h2 class="font-bold text-gradient text-2xl mt-3">เลือกเพื่อบรีฟ</h2>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Cards with sequential delay for staggered entry (Now Clickable Links) -->
+                    <a href="https://drive.google.com/drive/folders/1gIwDSg8T3CgNpxTZpcwXiYg_eymKncpx" target="_blank" class="cute-card aspect-square flex flex-col items-center justify-center cursor-pointer animate-fade-in-up group" style="animation-delay: 0.1s;">
+                        <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mb-3 text-pink-400 text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-globe"></i></div>
+                        <span class="text-sweet-pink font-bold text-lg">เว็บ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/139fgPYRMWLkn4JLcbm5oS9DKd524rUHS" target="_blank" class="cute-card aspect-square flex flex-col items-center justify-center cursor-pointer animate-fade-in-up group" style="animation-delay: 0.2s;">
+                        <div class="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mb-3 text-purple-400 text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-face-smile-wink"></i></div>
+                        <span class="text-sweet-purple font-bold text-lg">สติกเกอร์</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1iNkrnKH7dw5hznWcxlFURHZxWWnxfNhL" target="_blank" class="cute-card aspect-square flex flex-col items-center justify-center cursor-pointer animate-fade-in-up group" style="animation-delay: 0.3s;">
+                        <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mb-3 text-pink-400 text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-palette"></i></div>
+                        <span class="text-sweet-pink font-bold text-lg">ตูน</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1S0FjHk7e_g7SNpGycchnI_NbrYpVz5xe" target="_blank" class="cute-card aspect-square flex flex-col items-center justify-center cursor-pointer animate-fade-in-up group" style="animation-delay: 0.4s;">
+                        <div class="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mb-3 text-purple-400 text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-pen-nib"></i></div>
+                        <span class="text-sweet-purple font-bold text-lg">บล็อก</span>
+                    </a>
+                </div>
+
+                <!-- Instructions Box -->
+                <div class="cute-card p-5 mt-4 flex flex-col items-start justify-center animate-fade-in-up" style="animation-delay: 0.5s;">
+                    <h3 class="text-gradient font-bold text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-list-check text-pink-400"></i> วิธีสั่งงาน</h3>
+
+                    <!-- Web -->
+                    <h4 class="text-sweet-purple font-semibold text-[13px] mb-1.5"><i class="fa-solid fa-globe text-pink-300 text-xs mr-1"></i> งานเว็บ</h4>
+                    <ul class="text-[11px] sm:text-xs text-gray-600 space-y-1 mb-3 pl-4 border-l-2 border-pink-100 w-full">
+                        <li>- เลือกเทมเพลตที่ชอบ หรือ บรีฟให้ร้านออกแบบให้</li>
+                        <li>- กรอกฟอร์มตามที่ร้านให้</li>
+                        <li>- รวมยอด โอน = ล็อคคิว รองานตามคิว</li>
+                    </ul>
+
+                    <!-- Sticker -->
+                    <h4 class="text-sweet-purple font-semibold text-[13px] mb-1.5"><i class="fa-solid fa-face-smile-wink text-purple-300 text-xs mr-1"></i> สติกเกอร์</h4>
+                    <ul class="text-[11px] sm:text-xs text-gray-600 space-y-1 mb-3 pl-4 border-l-2 border-purple-100 w-full">
+                        <li>- เลือกตูน / ลายเส้น / ส่งรูปให้ร้าน</li>
+                        <li>- บรีฟข้อความ รายละเอียดต่างๆ</li>
+                        <li>- รวมยอด โอน = ล็อคคิว รองานตามคิว</li>
+                    </ul>
+
+                    <!-- Sign -->
+                    <h4 class="text-sweet-purple font-semibold text-[13px] mb-1.5"><i class="fa-solid fa-image text-pink-300 text-xs mr-1"></i> งานป้าย</h4>
+                    <ul class="text-[11px] sm:text-xs text-gray-600 space-y-1 mb-4 pl-4 border-l-2 border-pink-100 w-full">
+                        <li>- เลือกตูน เลือกบล็อกที่ชอบให้ร้าน</li>
+                        <li>- บรีฟรายละเอียด ป้ายที่อยากได้</li>
+                        <li>- รวมยอด โอน = ล็อคคิว รองานตามคิว</li>
+                    </ul>
+
+                    <!-- Warnings -->
+                    <div class="bg-pink-50/50 rounded-xl p-3 border border-pink-100 w-full">
+                        <ul class="text-[11px] sm:text-xs text-gray-600 space-y-2 font-light mb-3">
+                            <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-exclamation text-pink-400 mt-0.5 shrink-0"></i> <span>ทางร้านไม่รับบรีฟตูนสีนึง ป้ายสีนึงไปคนละทิศละทางนะคะ บรีฟงานให้ละเอียด เช็คความถูกต้องให้เรียบร้อย</span></li>
+                            <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-exclamation text-pink-400 mt-0.5 shrink-0"></i> <span>หากบรีฟผิดแล้วอยากแก้ <span class="font-medium text-sweet-pink">คิดจุดละ 10.-</span> (หากทางร้านทำผิดเองแก้ให้ฟรี)</span></li>
+                        </ul>
+                        <div class="bg-red-50 text-red-500 text-[10px] sm:text-[11px] font-bold p-2.5 rounded-lg border border-red-100 text-center leading-relaxed animate-pulse">
+                            🚨 ระหว่างเช็คงานอยากแก้ตรงไหนให้บอกทีเดียว ถ้าให้ร้านแก้ไปแก้มาคิดครั้งละ 10 บาท
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 3: REVIEW/CHAT (รีวิว) ================= -->
+            <div id="page-review" class="page-content flex flex-col min-h-full hidden">
+                
+                <div class="cute-card p-4 mb-6 flex items-center justify-center shrink-0 animate-fade-in-up text-center">
+                    <p class="text-sweet-purple text-[13px] sm:text-sm font-medium leading-relaxed">
+                        ฮ๊าย ฮาย โนริขอบคุณที่แวะมาอุดหนุนแม่ค้าตัวน้อยๆคนนี้นะค้าบ💗🙏🏻<br>
+                        ไว้มีโอกาสมาอุดหนุนกันอีกนะคะ ✨<br>🌈Have a good day 🌻
+                    </p>
+                </div>
+
+                <!-- Chat Area -->
+                <div id="chat-container" class="flex-1 space-y-5 mb-6 px-1">
+                    <!-- Left Bubble -->
+                    <div class="flex justify-start items-end gap-2 animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="w-8 h-8 rounded-full bg-pink-100 border border-pink-200 shrink-0 flex items-center justify-center text-sm shadow-sm">🌸</div>
+                        <div class="bubble-left p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-gray-600 relative break-words">
+                            งานน่ารักมากเลยค่ะ แอดมินใจดีมากๆ 💕
+                        </div>
+                    </div>
+                    <!-- Right Bubble -->
+                    <div class="flex justify-end items-end gap-2 animate-fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="bubble-right p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-sweet-purple text-right break-words">
+                            ขอบคุณมากนะค้าา ไว้มาอุดหนุนใหม่น้า ✨
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-purple-100 border border-purple-200 shrink-0 flex items-center justify-center text-sm shadow-sm">✨</div>
+                    </div>
+                     <!-- Left Bubble -->
+                     <div class="flex justify-start items-end gap-2 animate-fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="w-8 h-8 rounded-full bg-pink-100 border border-pink-200 shrink-0 flex items-center justify-center text-sm shadow-sm">🎀</div>
+                        <div class="bubble-left p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-gray-600 break-words">
+                            ตรงบรีฟเป๊ะๆ เลย ชอบมากกกก 10/10 😍
+                        </div>
+                    </div>
+                    <!-- Right Bubble -->
+                    <div class="flex justify-end items-end gap-2 animate-fade-in-up" style="animation-delay: 0.4s;">
+                        <div class="bubble-right p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-sweet-purple text-right break-words">
+                            ยินดีให้บริการค่าา 💖
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-purple-100 border border-purple-200 shrink-0 flex items-center justify-center text-sm shadow-sm">💖</div>
+                    </div>
+                </div>
+
+                <!-- Input Area (Sticks to bottom of content) -->
+                <div class="shrink-0 mt-auto pt-2 animate-fade-in-up" style="animation-delay: 0.5s;">
+                    <div class="bg-white rounded-full px-5 py-4 shadow-md border border-pink-100 flex items-center gap-3">
+                        <i class="fa-regular fa-face-smile text-pink-400 text-xl cursor-pointer"></i>
+                        <input id="review-input" type="text" placeholder="พิมพ์ข้อความรีวิว..." class="bg-transparent w-full outline-none text-sm text-gray-600 placeholder-pink-300" onkeypress="if(event.key === 'Enter') addReview()">
+                        <i onclick="addReview()" class="fa-solid fa-paper-plane text-purple-400 cursor-pointer hover:scale-110 active:scale-90 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 4: GROUP (ตัวอย่างกลุ่ม) ================= -->
+            <div id="page-group" class="page-content space-y-4 hidden">
+                <div class="text-center animate-fade-in-up">
+                    <h2 class="font-bold text-gradient text-2xl inline-block border-b-4 border-pink-200 pb-1">กลุ่มทั้งหมด</h2>
+                </div>
+
+                <!-- Additional Link Button (ย้ายมาด้านบน) -->
+                <a href="https://linkbio.co/noridesign" target="_blank" class="w-full bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-3 flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform shadow-sm border border-pink-100 animate-fade-in-up" style="animation-delay: 0.05s;">
+                    <i class="fa-solid fa-star text-yellow-400 animate-pulse text-sm"></i>
+                    <span class="text-[12px] font-bold text-sweet-purple">ตัวอย่างกลุ่มต่างๆเพิ่มเติม คลิกเลย!</span>
+                    <i class="fa-solid fa-star text-yellow-400 animate-pulse text-sm"></i>
+                </a>
+                
+                <!-- Group Links Grid (Scrollable list of buttons) -->
+                <div class="grid grid-cols-2 gap-2 animate-fade-in-up pb-2" style="animation-delay: 0.1s;">
+                    <!-- Auto-generated Items from your list -->
+                    <a href="https://drive.google.com/drive/folders/1YKwLAZogYhZKBWPBxGKTGVwzR3zcEDel" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/4NTmZ4r9/IMG-0690.jpg" alt="กลุ่มนี่เส้นปะ" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มนี่เส้นปะ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1Ye9suMpDDivZ45bzRfnQ0f-o1w0dEHvQ" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/L4PpHtpr/D3AF8DC0-E077-4CF9-BC5E-DA4F793B823B.jpg" alt="กลุ่ม INKY GROUP" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่ม INKY GROUP</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1EHSj38mZ9XxLsmS1WXyrjTIOsl7sjGQK" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/WzNC6kdd/IMG-9847.jpg" alt="ลายเส้น Belinda" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">ลายเส้น Belinda</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1fItAncfAu3g91k6dYNnX7EEihn3dj4kS" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/nVQf2vSX/4DBD5B4E-8F00-40EC-9E19-561D8015B380.jpg" alt="Still drawing v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Still drawing v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1V9U2f1Z9HHZmFqVR5H_H_XRo-VF-D6T5" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/bNs8K7v1/mi-m-ch-x-209-20260208102857.png" alt="Still drawing v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Still drawing v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1EdZHXv2yzinG1-fCTeszo4IFTcEwBN1t" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/3NsbQ15N/mi-m-ch-x-15-20260409105335.png" alt="กลุ่มMerita" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มMerita</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1NdbzjMsB3Le66YlvXCWt6ywZI18__sVk" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/NGRjNq5Y/402B7445-6728-4F7B-82F4-905E9296008C.jpg" alt="กลุ่มCalista" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มCalista</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/117KeqfEJU-VrfHPzpAPDeNT62nvaPB7a" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/4ddp64JZ/att-p8X8tf-Vs5HHh-Fyen2EHhoxqx-P3s6ku-Q-ct4s-Yi5m26A.jpg" alt="กลุ่มJamille" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มJamille</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1drtqFx3YBzHjnrjt-BrzdZm5FFlyBCKW" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/wxRmgGMZ/IMG-0923.jpg" alt="กลุ่มPancake" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มPancake</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1lWfTHqAbVoZH2YveT70TO5pmfiikwY3G" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/zXv9PTGQ/IMG-1322.jpg" alt="กลุ่มQueen pop" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มQueen pop</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1ijU1i-CNAZgKTul6lmiN6VIDsPwVU2sd" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/jjn8zhvc/mi-m-ch-x-8-20260404131206.png" alt="กลุ่มHormony" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มHormony</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1pgnqUzdmjW7vK0s_fNCV0SY6-S-FHOzp" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/MKdy8hKs/mi-m-ch-x-230-20260310203249.png" alt="กลุ่มMoonie" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มMoonie</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1LaYCivILFAjqKgnzTMJJ5RlRXZgB9YWf" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/SKKGrfrZ/mi-m-ch-x-225-20260220112659.png" alt="กลุ่มFusion" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มFusion</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1CrGdw6jr_cYcRr2LXKq_yhrkMvna8fVX" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/XNLgBh4y/IMG-1324.jpg" alt="kawaii Fuji" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">kawaii Fuji</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/13zR7r66v8hO-rD2t6LahxD1f9Mc8J1Ue" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/KYRmyCfs/34095E6F-A7F5-47B1-997F-21D8B4F9DF07.jpg" alt="Teaching group" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Teaching group</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1d6IxpNl4zajE7XP-W2KJ17wkGPkG11uj" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/657Yscxs/IMG-8753.jpg" alt="กลุ่มMitarashi" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มMitarashi</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1cV7jkDmRh1VD-nD_I-VDsW__zUzSFYYQ" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/LXbr7ygp/mi-m-ch-x-210-20260306131359.png" alt="กลุ่มJainoy" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มJainoy</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1skKUNZSFr1cE_PQwmk5dG-26zjnaRq9J" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/mDXtBQWk/IMG-1323.jpg" alt="กลุ่มฟุคุเนโกะ" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มฟุคุเนโกะ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1KE9lcHUTP5sS8csxiCD9shzwH3dW9gzV" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/J0CJ9NNV/IMG-6637.jpg" alt="Glitter magic" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Glitter magic</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1Ufh9MFi49FBX00bPe05pXAtlWMdG3-0k" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/bwZJ9GnV/IMG-6638.jpg" alt="กลุ่มแมวดำ" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มแมวดำ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1_szs-_HaCJMy6hBb7N4_dDVzZW4jkQoS" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/15t5ygvz/IMG-6636.jpg" alt="Jellybunnie v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Jellybunnie v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1QGC5IfTfafn6s0OFwhW17p92fwpAs2fx" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/Rh80k45c/75C6487B-CC41-42BE-94F0-4E0EAB356111.jpg" alt="Jellybunnie v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Jellybunnie v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/10YI5_ZXufqnMh896HnB2Z6LD888Imh-0" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/3N9XmyvV/6ADA330A-D064-4D9A-A39C-48E233EEA3EA.jpg" alt="นุบนิบบรัช" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">นุบนิบบรัช</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1mDzXfPna4LjDyzU8jRJT9-LQykywM1YZ" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/DzbT8LGT/IMG-0367.jpg" alt="Trick sticker" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Trick sticker</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1VG-NqauROtZhjzgYePtfd6TI3XsKry7f" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/X738Wfft/mi-m-ch-x-198-20260306115332.png" alt="Sugar plum v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Sugar plum v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1IhgsHW0niXL1P7TN-muEteDPSe7lPEwq" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/qMdmRVTW/mi-m-ch-x-251-20260319222852.png" alt="Sugar plum v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Sugar plum v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-TTWSUqSELb80zXcnYaZaYxTyGRLio5W" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/13sYWx7P/mi-m-ch-x-210-20260306134602.png" alt="kuromi box" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">kuromi box</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1g565WGi56qOg09APdgYthQPRZYHsQ9pf" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/bJC6rsq9/mi-m-ch-x-230-20260310153533.png" alt="Little spark" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Little spark</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1A5FC5j1dGakbow9ISiFywUSPOymAXPSW?usp=drive_link" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/vHBgFhqh/att-Pq-Ap-c6YBh-LNi-p-GWf-XCRsig2RSzk-Lj-Xcgfj-LOz3to-A.jpg" alt="กลุ่มVioer" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มVioer</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1e8R2bs55n3ppm4cP-DTbp7PxPBZZLi2F" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/9XksqrWD/IMG-8296.jpg" alt="กลุ่มPikoro" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มPikoro</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/18wz_Hx9Iik7YGXZK4nOi8i2z1IdcZOg6" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/0ySNPBpY/att-Gle-UAy-INh-IVTOAFH4nb-Or-C-e-UArc-N7Pcr-J5ngv6NPY8.jpg" alt="กลุ่มSerabies" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มSerabies</span>
+                    </a>
+                    <a href="https://shorturl.asia/zVTa9" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/90vjkcg8/att-x3zw-sg-Ge-HCLy-yf-Dk6V-dulha-Lw-Cb-Aa9x-REHSct8.jpg" alt="กลุ่มRosella" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มRosella</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1O5mfoZTg1Ecoh99PsIz3EEgAWvAWUc0Q" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/ncZGMW9k/mi-m-ch-x-230-20260310153044.png" alt="Kelbies v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Kelbies v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1v7GevdSytdczmDmOlQ7tF3AEOunTHqBc" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/gkYyw3MM/att-yc-C6Ki-LKU-R18v-Inz-H7na2vtmo3txrjk-ISBN8Cs-Kp-Wo.jpg" alt="Kelbies v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Kelbies v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1ymzwaJGDlrMyp7JJB9kkJMl4bH8utyz7" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/j2Rf7rhq/att-wdcvr-Ovir4-Wl-IV0EVEw-dg-Sm2H7-26HBoh-FMVYZ-ZQ.jpg" alt="Kellynori v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Kellynori v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1MJ9SuXIzyz3_alVFNA_HQ3oMULjRpQdQ" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/15CFf2Vy/att-G7TBRf-Rbaa-Whodx-V3b-OQVrhn-KVVTa-IAcr-o-ZZn276U8.jpg" alt="kellynori v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">kellynori v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1hiHUQv2oRy2SQCMefPAiKjR3iNjoPlyT" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/R0VNgWf1/att-orz-T-7vw-JY5bb1bw67d-e-ZJ5d4lewhqv-SBWOUZ3t-DJE.jpg" alt="little baby" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">little baby</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/14RG7Br-1PVr8K76cb2gnQZgDacK6Hp6Q" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/638TNFMn/att-1s-Ob7Qu-SFg-Dt-Jq5MNEX1uk-Ar-UM-BIZadi2Cmze-Lx-HQ.jpg" alt="miracle v1" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">miracle v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/11Pq2C3rt8CIBbhV7Pn-IXYmahdmjRR7n" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/bJ4rYLMq/att-5SNEw-UXmztr-Gq9e-Qx4AA01Et-Juypriz-HR67r-Wn8HZM.jpg" alt="miracle v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">miracle v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1cgM-RKOiolqM8g8bH3AjN9GeEPyUxUYH" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/ZqkRKGCn/mi-m-ch-x-251-20260313194240.png" alt="สอนวาดฮาวคิ้ว" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">สอนวาดฮาวคิ้ว</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1AUqfiQaXiCsyRl_4VA4xme7G0_ElUJsD" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/4dsLjPL5/inbound1562397796736806510.jpg" alt="Mojibuttercream" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Mojibuttercream</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/134iFsHtgWDI72VZvF0Q8SsEfpMalzLr1" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/sXZnQ26j/inbound3750487854414395197.jpg" alt="กลุ่ม : Jida" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่ม : Jida</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1E1Ros2sTsRhxvP2uvR0ADLvShN76h-DZ" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/VsnGzd0t/inbound3068219747135711811.jpg" alt="กลุ่ม Jaomai" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่ม Jaomai</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1rFWFKbanW-sE4K0ftBfAM42vg9dOT26q" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/65zhQRWh/inbound2491503497255246139.jpg" alt="กาลครั้งหนึ่ง" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กาลครั้งหนึ่ง</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1lN3dzi-3PkPJrPHLmnSKPYj5xDIWDaga" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/cLxtr597/inbound1259467213766867034.jpg" alt="Jelly Nelly v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Jelly Nelly v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1KXb33L7g0WjjtDNRdmAmJTqeAAFegOHW" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/PJnPh6pg/inbound6351265393967824687.jpg" alt="Jelly Nelly" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Jelly Nelly</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1xoU-eTVfYhvrYC6-bhpm8rphPU5NsYmr" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/4N5mkQJD/inbound3490101873763633921.jpg" alt="กลุ่ม HYPATIA" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่ม HYPATIA</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-qqnVn2dmJ4g3fjltGRFFhvYynaYeh-M" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/pLcryV54/inbound6448851191204479692.jpg" alt="Puro Pop Ping" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Puro Pop Ping</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/118CrpaAfwUM6UAPQWQUMtzJjVY-qYqfp" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/QCCn8q2m/inbound1612837020638788131.jpg" alt="Rosella Box" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Rosella Box</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1mnMlL62RciZzNc9ixBl12Qw65yyy-asy" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/65D1KnMt/inbound4427160023385807927.jpg" alt="กลุ่ม Cynthia" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่ม Cynthia</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1fj024BhkgC1ctJeiwyZUG3USteSdzWzr" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/W4790Kjw/inbound904719745733466606.jpg" alt="คอร์สสอนทำเว็บ" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">คอร์สสอนทำเว็บ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1fhazJxxe0qMa-NdkSwlbdi81Vpg5lrMR" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/k41fpbVr/inbound6969333635034210317.jpg" alt="MumuLandBox" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">MumuLandBox</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1eaMZGJDwaXpGYynSNQFU9ieHY55TlGjL" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/V6xDwcFd/inbound4370385353092139329.jpg" alt="Jamille Block v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Jamille Block v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/11F9r_TWWm-mfmspSZ6H-_j3UTbcAoHbV" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/13mMsBD7/inbound7437015600281905642.jpg" alt="La-ong bg" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">La-ong bg</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1qBub18-Pynr2Q7uMbbpw59qrm3bt4sgz" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/c4NX50CZ/inbound3281579391587217289.jpg" alt="สอนทำป้าย" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">สอนทำป้าย</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1aGSijNI8OQIaRLCgG3ggkhCkvWGVZz7n" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/50s3TVQT/inbound2979567683352726503.jpg" alt="กลุ่มFuwaneko" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มFuwaneko</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-29hrx9OOGMx4HWjdcih-c7N6GwaudOB" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/kgWy98tv/inbound471103355075937452.jpg" alt="กลุ่มFomupink" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มFomupink</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/143kSXFhJ9ymd5Wayxt0XPryHHP5fK6W4" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/FRvr8tX2/inbound7623086482654104850.jpg" alt="Tiny Stuff" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Tiny Stuff</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1VlhtlIuZ7ZWEo7tt6FzhmNvoyIO6c9oe" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/CL5FWH9V/inbound7852751355940632118.jpg" alt="Vivian Group" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Vivian Group</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1MnJiUkDjJSZEX4JQDf2k9I0drBPWsJnN" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/JhVMHw0m/inbound8962617393729544834.jpg" alt="HOWBIES PIECES" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">HOWBIES PIECES</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/171dXveVqgWaPQcnR6v80yoYHfu82RpN7" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/j59bTBGc/inbound8114555736221520943.jpg" alt="Cherry Block" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Cherry Block</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1vSq70H2Nn5s-l9huGPQQZ9Sqi8lgvw4W" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/T3XTpMpy/inbound8885263250521809776.jpg" alt="Cherry Block v2" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Cherry Block v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1cjINwZkH242BtFmTctYAgk27FtzUTr1g" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/q7wJPbJP/inbound6507821864052519485.jpg" alt="Cherry Block v3" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Cherry Block v3</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1K-flM1lX1AqK21yiy1P0uLpSZ0dSWGbv" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/SQ2X94Nz/inbound912665101376238780.jpg" alt="Every Thing" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Every Thing</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-0Hsh9OrKiW3gj64U61eXbOL6aNVd0Po" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/gk7NDm34/inbound7264422450242824422.jpg" alt="Pink Pearl" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Pink Pearl</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1LElAnqLLFEWT-2hwbjAoRUhgBAt9dscC" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/G2bQ221v/inbound8896863622252060410.jpg" alt="Wendy Cream" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Wendy Cream</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1byKlxmhhqHA-sl2R7UbZGsc2X70emTvY" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/c4PB3TNp/inbound8274150403905315931.jpg" alt="Pony Sweet" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Pony Sweet</span>
+                    </a>
+                    <a href="https://shorturl.asia/vA3o7" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/52YftB5J/inbound4726049630482076237.jpg" alt="Cinnamon Pink" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Cinnamon Pink</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/16gOPH3c18IUGTdoGZoYuwFxnNcklGH6a" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/vm5MrGSC/inbound1417311853472417417.jpg" alt="Happy Cutie" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">Happy Cutie</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1LbjQjmSGrHgLqa_fsBtmb9jqvO7OAUKY" target="_blank" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/Df1Yc0gF/1776958061574.jpg" alt="กลุ่มRiselia" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มRiselia</span>
+                    </a>
+                    <a href="#" class="bg-white/90 border border-pink-100 rounded-xl p-1 shadow-sm flex items-center gap-2 hover:bg-pink-50 transition-all active:scale-95 overflow-hidden">
+                        <img src="https://i.postimg.cc/7YPgj63z/inbound669262774275868278.jpg" alt="กลุ่มสอนวาดBy lxlyr" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-pink-50"><span class="text-[10px] text-sweet-text font-medium truncate w-full pr-1">กลุ่มสอนวาดBy lxlyr</span>
+                    </a>
+                </div>
+
+                <!-- Promotion & Info -->
+                <div class="cute-card p-4 flex flex-col items-start justify-center animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-gradient font-bold text-sm mb-3 flex items-center gap-1.5">
+                        <i class="fa-solid fa-credit-card text-pink-400"></i> โปรโมชั่น & การผ่อน
+                    </h3>
+                    
+                    <ul class="text-[11px] text-gray-600 space-y-2 font-light px-1">
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-pink-400 mt-0.5"></i> 
+                            <span class="leading-relaxed">สามารถผ่อนได้ระยะเวลา 1 เดือน ไม่จำกัดยอด <br><span class="text-red-400 font-medium">เกินกำหนดยึดยอด</span></span>
+                        </li>
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-pink-400 mt-0.5"></i> 
+                            <span class="leading-relaxed">ยอด 60+ ต่อสลิป ได้รับสะสมแต้ม 1 แต้ม</span>
+                        </li>
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-pink-400 mt-0.5"></i> 
+                            <span class="leading-relaxed">ยอด 600 บาทขึ้นไปต่อ 1 สลิป <br><span class="font-bold text-sweet-pink">แถมสติกเกอร์ / ธีมไลน์ 50c</span></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 5: WORK (ตัวอย่างผลงาน) ================= -->
+            <div id="page-work" class="page-content space-y-5 hidden">
+                <div class="text-center animate-fade-in-up">
+                    <h2 class="font-bold text-gradient text-2xl inline-block border-b-4 border-purple-200 pb-1">ตัวอย่างผลงาน</h2>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Scrapbook style items (now clickable links) -->
+                    <a href="https://www.facebook.com/profile.php?id=61574306123714" target="_blank" class="cute-card aspect-[4/5] flex flex-col items-center justify-center cursor-pointer transform -rotate-2 hover:rotate-0 transition-transform animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="w-full h-[70%] bg-pink-100 rounded-t-2xl mb-2 flex items-center justify-center overflow-hidden"><img src="https://i.postimg.cc/5tQLBPzY/att-PDp4s-PQcx1g-RRRWY8ag-JQRJf-LVlj-H6r-LBE5R4be-9Kc.jpg" class="w-full h-full object-cover" alt="งานเว็บ"></div>
+                        <span class="text-sweet-pink font-bold pb-2">งานเว็บ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1rd5PkbYVH5lnOSqgqLH7SdDBvwX5Ae3b" target="_blank" class="cute-card aspect-[4/5] flex flex-col items-center justify-center cursor-pointer transform rotate-2 hover:rotate-0 transition-transform animate-fade-in-up" style="animation-delay: 0.2s;">
+                         <div class="w-full h-[70%] bg-purple-100 rounded-t-2xl mb-2 flex items-center justify-center overflow-hidden"><img src="https://i.postimg.cc/5tQLBPzY/att-PDp4s-PQcx1g-RRRWY8ag-JQRJf-LVlj-H6r-LBE5R4be-9Kc.jpg" class="w-full h-full object-cover" alt="สติกเกอร์"></div>
+                        <span class="text-sweet-purple font-bold pb-2">สติกเกอร์</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1ovnS1imBV8jKO-fCHfBhnd3NDw8Yl1lv" target="_blank" class="cute-card aspect-[4/5] flex flex-col items-center justify-center cursor-pointer transform -rotate-1 hover:rotate-0 transition-transform animate-fade-in-up" style="animation-delay: 0.3s;">
+                         <div class="w-full h-[70%] bg-pink-100 rounded-t-2xl mb-2 flex items-center justify-center overflow-hidden"><img src="https://i.postimg.cc/5tQLBPzY/att-PDp4s-PQcx1g-RRRWY8ag-JQRJf-LVlj-H6r-LBE5R4be-9Kc.jpg" class="w-full h-full object-cover" alt="ป้าย"></div>
+                        <span class="text-sweet-pink font-bold pb-2">ป้าย</span>
+                    </a>
+                    <a href="https://www.facebook.com/media/set/?set=a.122153343278842506&type=3" target="_blank" class="cute-card aspect-[4/5] flex flex-col items-center justify-center cursor-pointer transform rotate-3 hover:rotate-0 transition-transform animate-fade-in-up" style="animation-delay: 0.4s;">
+                         <div class="w-full h-[70%] bg-purple-100 rounded-t-2xl mb-2 flex items-center justify-center overflow-hidden"><img src="https://i.postimg.cc/5tQLBPzY/att-PDp4s-PQcx1g-RRRWY8ag-JQRJf-LVlj-H6r-LBE5R4be-9Kc.jpg" class="w-full h-full object-cover" alt="ปล่อยเอฟ"></div>
+                        <span class="text-sweet-purple font-bold pb-2">ปล่อยเอฟ</span>
+                    </a>
+                </div>
+
+                <div class="cute-card p-5 flex flex-col items-start justify-center animate-fade-in-up" style="animation-delay: 0.5s;">
+                    <h3 class="text-gradient font-bold text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info text-pink-400"></i>รายละเอียดงาน</h3>
+                    
+                    <div class="bg-red-50 text-red-500 text-xs font-bold p-3 rounded-xl mb-4 border border-red-100 w-full text-center leading-relaxed shadow-sm">
+                        💥 ไม่อนุญาตให้ก๊อป ตัด หิ้ว ผลงานของทางร้าน ผิดกฎพบเจอ ชิ้นงานละ 500 บาท 📍
+                    </div>
+                    
+                    <ul class="text-xs text-gray-600 space-y-2.5 font-light px-1">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-thumbtack text-purple-400 text-[10px] mt-0.5"></i> หลังจากได้รับงานแล้วให้เซฟภายในสิ้นเดือน</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-thumbtack text-purple-400 text-[10px] mt-0.5"></i> ร้านลบไฟล์ทุกสิ้นเดือน หากไม่เซฟทางร้านไม่รับผิดชอบใดๆทั้งสิ้น</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-thumbtack text-purple-400 text-[10px] mt-0.5"></i> ได้รับงานแล้วแต่อยากแก้ จุดละ 10 บาท 📍</li>
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Floating Bottom Navigation -->
+        <div class="absolute bottom-6 left-4 right-4 z-30 pointer-events-none">
+            <nav class="glass-nav rounded-[2rem] px-2 py-3 pointer-events-auto flex justify-between items-center relative">
+                
+                <!-- Nav Item 1 -->
+                <button id="nav-page-work" onclick="navigate('page-work')" class="nav-btn w-[18%] flex flex-col items-center justify-center py-2 rounded-2xl text-gray-400 transition-all hover:text-sweet-pink group">
+                    <i class="fa-solid fa-briefcase text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] font-medium">งาน</span>
+                </button>
+                
+                <!-- Nav Item 2 -->
+                <button id="nav-page-group" onclick="navigate('page-group')" class="nav-btn w-[18%] flex flex-col items-center justify-center py-2 rounded-2xl text-gray-400 transition-all hover:text-sweet-purple group">
+                    <i class="fa-solid fa-users text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] font-medium">กลุ่ม</span>
+                </button>
+                
+                <!-- Central Home Button (Prominent) -->
+                <div class="w-[20%] flex justify-center relative -top-6">
+                    <button id="nav-page-home" onclick="navigate('page-home')" class="nav-btn active w-16 h-16 rounded-full shadow-lg flex items-center justify-center border-4 border-white transform transition-transform active:scale-90 animate-bounce-soft" style="animation-duration: 3s;">
+                        <i class="fa-solid fa-house text-2xl text-white drop-shadow-md"></i>
+                    </button>
+                </div>
+                
+                <!-- Nav Item 4 -->
+                <button id="nav-page-brief" onclick="navigate('page-brief')" class="nav-btn w-[18%] flex flex-col items-center justify-center py-2 rounded-2xl text-gray-400 transition-all hover:text-sweet-pink group">
+                    <i class="fa-solid fa-list-check text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] font-medium leading-tight text-center">เลือกของ</span>
+                </button>
+                
+                <!-- Nav Item 5 -->
+                <button id="nav-page-review" onclick="navigate('page-review')" class="nav-btn w-[18%] flex flex-col items-center justify-center py-2 rounded-2xl text-gray-400 transition-all hover:text-sweet-purple group">
+                    <i class="fa-solid fa-star text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] font-medium">รีวิว</span>
+                </button>
+
+            </nav>
+        </div>
+
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bg-music" src="ruk.mp3" loop autoplay preload="auto"></audio>
+
+    <!-- JavaScript for Navigation & Active State -->
+    <script>
+        function navigate(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+                page.classList.remove('block');
+            });
+
+            // Show selected page (re-triggers animation)
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                // Small trick to restart animation
+                void targetPage.offsetWidth; 
+                targetPage.classList.add('block');
+            }
+
+            // Update Nav Active State
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                if(btn.id !== 'nav-page-home'){
+                   btn.classList.remove('bg-pink-50', 'text-sweet-pink', 'text-sweet-purple');
+                   btn.classList.add('text-gray-400');
+                } else {
+                   btn.classList.remove('active');
+                   btn.style.background = 'white';
+                   btn.querySelector('i').classList.remove('text-white');
+                   btn.querySelector('i').classList.add('text-gray-400');
+                }
+            });
+
+            const activeBtn = document.getElementById('nav-' + pageId);
+            if(pageId === 'page-home') {
+                activeBtn.classList.add('active');
+                activeBtn.style.background = ''; // Use CSS gradient
+                activeBtn.querySelector('i').classList.add('text-white');
+                activeBtn.querySelector('i').classList.remove('text-gray-400');
+            } else if (activeBtn) {
+                activeBtn.classList.add('bg-pink-50');
+                activeBtn.classList.remove('text-gray-400');
+                // Alternate active colors based on position
+                if(pageId === 'page-work' || pageId === 'page-brief') {
+                    activeBtn.classList.add('text-sweet-pink');
+                } else {
+                    activeBtn.classList.add('text-sweet-purple');
+                }
+            }
+
+            // Scroll to top
+            document.getElementById('main-scroll-area').scrollTop = 0;
+        }
+
+        // Initialize Home as active style & Load saved reviews
+        document.addEventListener('DOMContentLoaded', () => {
+            const homeBtn = document.getElementById('nav-page-home');
+            homeBtn.classList.add('active');
+            loadReviews(); // โหลดข้อมูลรีวิวที่เคยพิมพ์ไว้
+        });
+
+        // อาเรย์สำหรับสุ่มรูป/ไอคอนน่ารักๆ ใส่ในโปรไฟล์
+        const cuteAvatars = ['🎀', '🧸', '🌸', '✨', '🐰', '🍓', '🍰', '🍡', '💖', '🦄', '🌈', '🌷'];
+        let lastSide = 'right'; // ค่าเริ่มต้นเพราะข้อความ default สุดท้ายคือฝั่งขวา
+
+        // ฟังก์ชันโหลดรีวิวจาก LocalStorage
+        function loadReviews() {
+            const savedReviews = JSON.parse(localStorage.getItem('nori_reviews')) || [];
+            savedReviews.forEach(review => {
+                renderBubble(review.text, review.side, review.avatar);
+                lastSide = review.side; // อัปเดตฝั่งล่าสุดให้ตรงกับอันสุดท้ายที่เซฟไว้
+            });
+        }
+
+        // Add Review Function (ระบบส่งข้อความใหม่ + สลับฝั่ง + สุ่มรูป)
+        function addReview() {
+            const inputField = document.getElementById('review-input');
+            const message = inputField.value.trim();
+            if (message === '') return; // ถ้าไม่ได้พิมพ์อะไร ไม่ต้องทำอะไร
+
+            // กำหนดฝั่งสลับกัน
+            const currentSide = lastSide === 'right' ? 'left' : 'right';
+            
+            // สุ่มไอคอนน่ารักๆ เข้าธีมเว็บ
+            const randomAvatar = cuteAvatars[Math.floor(Math.random() * cuteAvatars.length)];
+
+            // บันทึกลง localStorage เพื่อให้ไม่หายเวลารีเฟรช
+            const savedReviews = JSON.parse(localStorage.getItem('nori_reviews')) || [];
+            savedReviews.push({ text: message, side: currentSide, avatar: randomAvatar });
+            localStorage.setItem('nori_reviews', JSON.stringify(savedReviews));
+
+            // แสดงผลขึ้นหน้าจอ
+            renderBubble(message, currentSide, randomAvatar);
+            
+            lastSide = currentSide; // อัปเดตฝั่งล่าสุด
+            inputField.value = ''; // เคลียร์ช่องพิมพ์
+
+            // เลื่อนหน้าจอลงมาด้านล่างสุดเพื่อให้เห็นข้อความที่เพิ่งส่ง
+            const scrollArea = document.getElementById('main-scroll-area');
+            setTimeout(() => {
+                scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+            }, 50);
+        }
+
+        // ฟังก์ชันสร้างกล่องข้อความ
+        function renderBubble(text, side, avatarEmoji) {
+            const chatContainer = document.getElementById('chat-container');
+            const newBubble = document.createElement('div');
+            
+            const avatar = document.createElement('div');
+            const bubbleContent = document.createElement('div');
+
+            // แยกสไตล์ ซ้าย-ขวา
+            if (side === 'left') {
+                newBubble.className = 'flex justify-start items-end gap-2 animate-fade-in-up mt-5';
+                avatar.className = 'w-8 h-8 rounded-full bg-pink-100 border border-pink-200 shrink-0 flex items-center justify-center text-sm shadow-sm';
+                bubbleContent.className = 'bubble-left p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-gray-600 relative break-words';
+                
+                avatar.textContent = avatarEmoji;
+                bubbleContent.textContent = text;
+                
+                newBubble.appendChild(avatar);
+                newBubble.appendChild(bubbleContent);
+            } else {
+                newBubble.className = 'flex justify-end items-end gap-2 animate-fade-in-up mt-5';
+                avatar.className = 'w-8 h-8 rounded-full bg-purple-100 border border-purple-200 shrink-0 flex items-center justify-center text-sm shadow-sm';
+                bubbleContent.className = 'bubble-right p-4 w-[80%] shadow-sm min-h-[60px] text-sm text-sweet-purple text-right relative break-words';
+                
+                avatar.textContent = avatarEmoji;
+                bubbleContent.textContent = text;
+
+                newBubble.appendChild(bubbleContent);
+                newBubble.appendChild(avatar);
+            }
+
+            // นำข้อความใหม่ไปต่อท้ายในช่องแชท
+            chatContainer.appendChild(newBubble);
+        }
+
+        // ระบบเสียงเพลงเล่นอัตโนมัติ (รองรับนโยบายป้องกันการเล่นเสียงของเบราว์เซอร์มือถือ)
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgMusic = document.getElementById('bg-music');
+            
+            // พยายามสั่งเล่นเพลงทันทีเมื่อโหลดเว็บ
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // หากเบราว์เซอร์หรือมือถือบล็อก Autoplay ให้รอผู้ใช้แตะหรือคลิกหน้าจอครั้งแรกแล้วค่อยเล่น
+                    const startAudio = () => {
+                        bgMusic.play();
+                        document.removeEventListener('click', startAudio);
+                        document.removeEventListener('touchstart', startAudio);
+                    };
+                    document.addEventListener('click', startAudio, { once: true });
+                    document.addEventListener('touchstart', startAudio, { once: true });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
